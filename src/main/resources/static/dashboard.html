@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Resume Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-page">
+    <nav class="navbar dashboard-nav">
+        <div class="logo"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>ResumeBuilder</div>
+        <div class="nav-user">
+            <span class="user-greeting" id="userGreeting"><i class="fa-solid fa-user-circle"></i> Welcome</span>
+            <a href="login.html" class="nav-btn" id="logoutBtn"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+    
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <h2>My Projects</h2>
+                <p style="color: var(--text-muted); margin-top: 4px;">Manage and download your ATS-ready resumes.</p>
+            </div>
+            <a href="builder.html" class="primary-btn dashboard-action-btn">
+                <i class="fa-solid fa-plus"></i> Create New
+            </a>
+        </div>
+        
+        <div class="resume-grid">
+            
+            <!-- Card 2: Create New -->
+            <div class="resume-card new-card" onclick="window.location.href='builder.html'">
+                <div class="new-card-content">
+                    <span class="plus-icon"><i class="fa-solid fa-file-circle-plus"></i></span>
+                    <h3>Start Blank Template</h3>
+                </div>
+            </div>
+
+            <!-- Card 1 -->
+            <div class="resume-card">
+                <div class="resume-card-preview">
+                     <div class="preview-overlay">
+                         <button class="icon-btn" title="Preview"><i class="fa-solid fa-eye"></i></button>
+                     </div>
+                     <i class="fa-solid fa-file-pdf doc-icon" style="color: #cbd5e1;"></i>
+                </div>
+                <div class="resume-card-body">
+                    <div class="card-title-row">
+                        <h3>Software Engineer Resume</h3>
+                        <span class="badge badge-success">Completed</span>
+                    </div>
+                    <p><i class="fa-regular fa-clock"></i> Updated 2 days ago</p>
+                    <div class="card-actions">
+                        <a href="builder.html" class="secondary-btn small-btn"><i class="fa-solid fa-pen"></i> Edit</a>
+                        <button class="secondary-btn small-btn danger"><i class="fa-solid fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greeting = document.getElementById('userGreeting');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const params = new URLSearchParams(window.location.search);
+            const nameFromQuery = params.get('name');
+            const emailFromStorage = localStorage.getItem('loggedInUserEmail');
+
+            const redirectToLogin = (showMessage) => {
+                localStorage.removeItem('loggedInUserName');
+                localStorage.removeItem('loggedInUserEmail');
+                if (showMessage) {
+                    alert('Your session has expired. Please login again.');
+                }
+                window.location.href = 'login.html';
+            };
+
+            if (nameFromQuery) {
+                localStorage.setItem('loggedInUserName', nameFromQuery);
+            }
+
+            const applyGreeting = (name) => {
+                if (greeting && name) {
+                    greeting.innerHTML = '<i class="fa-solid fa-user-circle"></i> Welcome, ' + name;
+                }
+            };
+
+            const cachedUserName = localStorage.getItem('loggedInUserName');
+            applyGreeting(cachedUserName);
+
+            const validateSession = (showMessageOnExpire) => {
+                fetch('/api/auth/me', {
+                    credentials: 'include'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Not logged in');
+                        }
+                        return response.json();
+                    })
+                    .then(me => {
+                        if (me.fullName) {
+                            localStorage.setItem('loggedInUserName', me.fullName);
+                            localStorage.setItem('loggedInUserEmail', me.email || '');
+                            applyGreeting(me.fullName);
+                        }
+                    })
+                    .catch(() => {
+                        redirectToLogin(showMessageOnExpire);
+                    });
+            };
+
+            validateSession(false);
+            setInterval(() => validateSession(true), 30000);
+
+            if ((!cachedUserName || cachedUserName.trim().toLowerCase() === 'john') && emailFromStorage) {
+                fetch('/api/auth/users')
+                    .then(response => response.ok ? response.json() : [])
+                    .then(users => {
+                        const matchedUser = users.find(user =>
+                            (user.email || '').toLowerCase() === emailFromStorage.toLowerCase()
+                        );
+
+                        if (matchedUser && matchedUser.fullName) {
+                            localStorage.setItem('loggedInUserName', matchedUser.fullName);
+                            applyGreeting(matchedUser.fullName);
+                        }
+                    })
+                    .catch(error => console.error('Unable to refresh user name:', error));
+            }
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (event) => {
+                    event.preventDefault();
+
+                    try {
+                        await fetch('/api/auth/logout', {
+                            method: 'POST',
+                            credentials: 'include'
+                        });
+                    } catch (error) {
+                        console.error('Logout request failed:', error);
+                    }
+
+                    localStorage.removeItem('loggedInUserName');
+                    localStorage.removeItem('loggedInUserEmail');
+
+                    alert('Session ended. Please login again.');
+                    window.location.href = 'login.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

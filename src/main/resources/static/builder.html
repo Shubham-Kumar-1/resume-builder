@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Resume Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Dynamic section styles */
+        .dynamic-entry {
+            border: 1px solid rgba(124,58,237,0.15);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            position: relative;
+            background: rgba(124,58,237,0.03);
+        }
+        .entry-index {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .remove-entry-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .remove-entry-btn:hover { background: rgba(239,68,68,0.1); }
+        .add-entry-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(124,58,237,0.08);
+            color: var(--primary-color);
+            border: 1.5px dashed rgba(124,58,237,0.4);
+            border-radius: 8px;
+            padding: 10px 16px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            margin-top: 4px;
+        }
+        .add-entry-btn:hover {
+            background: rgba(124,58,237,0.15);
+            border-color: var(--primary-color);
+        }
+        .skill-tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .skill-tag {
+            background: rgba(124,58,237,0.12);
+            color: var(--primary-color);
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .skill-tag .remove-skill { cursor: pointer; font-size: 0.7rem; opacity: 0.7; }
+        .skill-tag .remove-skill:hover { opacity: 1; }
+        .skill-add-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .skill-add-row input { flex: 1; }
+        .skill-add-row button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Panel: Form -->
+        <section class="form-panel">
+            <header class="app-header">
+                <h1>ATS Resume Builder</h1>
+                <p>Create your ATS-friendly resume instantly</p>
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button type="button" class="secondary-btn" onclick="window.location.href='dashboard.html'" style="flex:1;">
+                        <i class="fa-solid fa-arrow-left"></i> Dashboard
+                    </button>
+                    <button id="downloadBtn" class="primary-btn" style="flex:2;">
+                        <i class="fa-solid fa-file-pdf"></i> Download PDF
+                    </button>
+                </div>
+            </header>
+
+            <div class="form-container">
+                <form id="resumeForm">
+
+                    <!-- Personal Info -->
+                    <div class="form-section">
+                        <h2>Personal Information</h2>
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" id="fullName" placeholder="First Last" value="First Last">
+                        </div>
+                        <div class="input-group">
+                            <label>Location</label>
+                            <input type="text" id="location" placeholder="City, State Pincode" value="Mathura, Uttar Pradesh 281001">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Phone</label>
+                                <input type="text" id="phone" placeholder="1234567890" value="1234567890">
+                            </div>
+                            <div class="input-group">
+                                <label>Email</label>
+                                <input type="email" id="email" placeholder="you@gmail.com" value="sXXXXXXXX@gmail.com">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>LinkedIn</label>
+                                <input type="text" id="linkedin" placeholder="linkedin.com/in/..." value="linkedin.com/in/sXXXXXXXX-5000/">
+                            </div>
+                            <div class="input-group">
+                                <label>GitHub</label>
+                                <input type="text" id="github" placeholder="github.com/..." value="github.com/sxxx-ccc12/">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Internship / Experience -->
+                    <div class="form-section">
+                        <h2>Internship / Experience</h2>
+                        <div id="internshipContainer"></div>
+                        <button type="button" class="add-entry-btn" onclick="addEntry('internship')">
+                            <i class="fa-solid fa-plus"></i> Add Internship
+                        </button>
+                    </div>
+
+                    <!-- Projects -->
+                    <div class="form-section">
+                        <h2>Projects</h2>
+                        <div id="projectContainer"></div>
+                        <button type="button" class="add-entry-btn" onclick="addEntry('project')">
+                            <i class="fa-solid fa-plus"></i> Add Project
+                        </button>
+                    </div>
+
+                    <!-- Certificates -->
+                    <div class="form-section">
+                        <h2>Certificates</h2>
+                        <div id="certContainer"></div>
+                        <button type="button" class="add-entry-btn" onclick="addEntry('cert')">
+                            <i class="fa-solid fa-plus"></i> Add Certificate
+                        </button>
+                    </div>
+
+                    <!-- Technical Skills -->
+                    <div class="form-section">
+                        <h2>Technical Skills</h2>
+                        <div class="input-group">
+                            <label>Languages</label>
+                            <div class="skill-tag-row" id="tagsLanguages"></div>
+                            <div class="skill-add-row">
+                                <input type="text" id="addLang" placeholder="e.g. Java">
+                                <button type="button" onclick="addSkillTag('Languages')"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Technologies / Frameworks</label>
+                            <div class="skill-tag-row" id="tagsTech"></div>
+                            <div class="skill-add-row">
+                                <input type="text" id="addTech" placeholder="e.g. Spring Boot">
+                                <button type="button" onclick="addSkillTag('Tech')"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Other Skills</label>
+                            <div class="skill-tag-row" id="tagsOther"></div>
+                            <div class="skill-add-row">
+                                <input type="text" id="addOther" placeholder="e.g. Problem-Solving">
+                                <button type="button" onclick="addSkillTag('Other')"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="form-section">
+                        <h2>Education</h2>
+                        <div id="educationContainer"></div>
+                        <button type="button" class="add-entry-btn" onclick="addEntry('education')">
+                            <i class="fa-solid fa-plus"></i> Add Education
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+
+        <!-- Right Panel: Live Preview -->
+        <section class="preview-panel">
+            <div class="preview-wrapper">
+                <div id="resumePreview" class="resume-document">
+
+                    <!-- Header -->
+                    <div class="rv-header">
+                        <div class="rv-name" id="previewName">First Last</div>
+                        <div class="rv-location" id="previewLocation">Mathura, Uttar Pradesh 281001</div>
+                        <div class="rv-contact">
+                            &#9990; <span id="previewPhone">1234567890</span>
+                            &nbsp;&#9993; <span id="previewEmail">sXXXXXXXX@gmail.com</span>
+                            &nbsp;|&nbsp; <span id="previewLinkedin">linkedin.com/in/...</span>
+                            &nbsp;|&nbsp; <span id="previewGithub">github.com/...</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic previews injected by JS -->
+                    <div id="previewInternship"></div>
+                    <div id="previewProjects"></div>
+                    <div id="previewCerts"></div>
+                    <div id="previewSkills"></div>
+                    <div id="previewEducation"></div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <p>Generating ATS-friendly PDF...</p>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

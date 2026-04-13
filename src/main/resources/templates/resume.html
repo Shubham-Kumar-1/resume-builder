@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Resume</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10.5pt;
+            color: #111;
+            line-height: 1.45;
+            padding: 24px 36px;
+        }
+        /* ---- Header ---- */
+        .resume-name {
+            font-size: 20pt;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .resume-location {
+            text-align: center;
+            font-size: 10pt;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .contact-bar {
+            text-align: center;
+            font-size: 9.5pt;
+            color: #222;
+            margin-bottom: 14px;
+        }
+        .contact-bar a { color: #1a0dab; text-decoration: none; }
+        .sep { margin: 0 6px; color: #999; }
+
+        /* ---- Section ---- */
+        .section-title {
+            font-size: 11.5pt;
+            font-weight: bold;
+            color: #000;
+            border-bottom: 1.5px solid #000;
+            margin-top: 13px;
+            margin-bottom: 7px;
+            padding-bottom: 1px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---- Experience / Internship ---- */
+        .item { margin-bottom: 9px; }
+        .item-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .item-role { font-weight: bold; font-size: 11pt; }
+        .item-date { font-size: 9.5pt; color: #333; font-weight: bold; }
+        .item-company { font-style: italic; color: #cc0000; font-size: 10pt; margin-bottom: 4px; }
+        .item-desc-list { padding-left: 18px; margin-top: 3px; }
+        .item-desc-list li { margin-bottom: 3px; font-size: 10pt; line-height: 1.4; }
+
+        /* ---- Projects ---- */
+        .proj-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .proj-name { font-weight: bold; font-size: 10.5pt; }
+        .proj-tech { font-style: italic; color: #555; font-size: 9.5pt; }
+        .proj-date { font-size: 9.5pt; color: #333; font-weight: bold; }
+        .proj-link { font-size: 9.5pt; margin-top: 1px; }
+        .proj-link strong { color: #000; }
+
+        /* ---- Certificates ---- */
+        .cert-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .cert-name { font-weight: bold; font-size: 10.5pt; }
+        .cert-date { font-size: 9.5pt; color: #333; font-weight: bold; }
+        .cert-org { font-style: italic; color: #cc0000; font-size: 10pt; }
+
+        /* ---- Skills ---- */
+        .skills-row { font-size: 10pt; margin-bottom: 3px; }
+        .skills-label { font-weight: bold; }
+
+        /* ---- Education ---- */
+        .edu-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .edu-institution { font-weight: bold; font-size: 10.5pt; }
+        .edu-dates { font-size: 9.5pt; font-weight: bold; }
+        .edu-sub { display: flex; justify-content: space-between; font-size: 9.5pt; color: #333; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <div class="resume-name" th:text="${resume.personalInfo.fullName}">First Last</div>
+    <div class="resume-location" th:text="${resume.personalInfo.location}">City, State Pincode</div>
+    <div class="contact-bar">
+        &#9990;&#160;<span th:text="${resume.personalInfo.phone}">1234567890</span>
+        <span class="sep">&#9993;</span>
+        <a th:href="'mailto:' + ${resume.personalInfo.email}" th:text="${resume.personalInfo.email}">email@gmail.com</a>
+        <span class="sep">|</span>
+        <a th:href="'https://' + ${resume.personalInfo.linkedin}" th:text="${resume.personalInfo.linkedin}">linkedin.com/in/...</a>
+        <span class="sep">|</span>
+        <a th:href="'https://' + ${resume.personalInfo.github}" th:text="${resume.personalInfo.github}">github.com/...</a>
+    </div>
+
+    <!-- ===== INTERNSHIP / EXPERIENCE ===== -->
+    <div class="section-title">Internship</div>
+    <div class="item" th:each="exp : ${resume.experience}">
+        <div class="item-header-row">
+            <span class="item-role" th:text="${exp.role}">Role Title</span>
+            <span class="item-date" th:text="${exp.duration}">May 2023 – July 2023</span>
+        </div>
+        <div class="item-company" th:text="${exp.company}">Company Name</div>
+        <ul class="item-desc-list">
+            <li th:each="line : ${#strings.arraySplit(exp.description, '\n')}" th:text="${line}">Detail</li>
+        </ul>
+    </div>
+
+    <!-- ===== PROJECTS ===== -->
+    <div class="section-title">Projects</div>
+    <div class="item" th:each="proj : ${resume.projects}">
+        <div class="proj-header-row">
+            <span>
+                <span class="proj-name" th:text="${proj.title}">Project Name</span>
+                <span class="proj-tech" th:if="${proj.technology != null and !proj.technology.isEmpty()}">
+                    &#160;|&#160;<em th:text="${proj.technology}">Tech Stack</em>
+                </span>
+            </span>
+            <span class="proj-date" th:text="${proj.duration}">Date Range</span>
+        </div>
+        <ul class="item-desc-list">
+            <li th:each="line : ${#strings.arraySplit(proj.description, '\n')}" th:text="${line}">Detail</li>
+        </ul>
+        <div class="proj-link" th:if="${proj.githubLink != null and !proj.githubLink.isEmpty()}">
+            Github Repository Link: &#160;<strong th:text="${proj.githubLink}">https://github.com/...</strong>
+        </div>
+    </div>
+
+    <!-- ===== CERTIFICATES ===== -->
+    <div class="section-title" th:if="${resume.certificates != null and !resume.certificates.isEmpty()}">Certificates</div>
+    <div class="item" th:each="cert : ${resume.certificates}">
+        <div class="cert-header-row">
+            <span class="cert-name" th:text="${cert.name}">Certificate Name</span>
+            <span class="cert-date" th:text="${cert.date}">Month Year</span>
+        </div>
+        <div class="cert-org">
+            <span th:text="${cert.organization}">Org</span>
+            <span th:if="${cert.link != null and !cert.link.isEmpty()}">
+                &#160;- <a th:href="${cert.link}" th:text="${cert.link}">Certificate Link</a>
+            </span>
+        </div>
+    </div>
+
+    <!-- ===== TECHNICAL SKILLS ===== -->
+    <div class="section-title">Technical Skills</div>
+    <div class="skills-row">
+        <span class="skills-label">Languages</span>: <span th:text="${resume.skills.languages}">C++, Java, JavaScript</span>
+    </div>
+    <div class="skills-row">
+        <span class="skills-label">Technologies/Frameworks</span>: <span th:text="${resume.skills.technologies}">Angular, React, Node.js</span>
+    </div>
+    <div class="skills-row">
+        <span class="skills-label">Skills</span>: <span th:text="${resume.skills.other}">Data Structures, Problem Solving</span>
+    </div>
+
+    <!-- ===== EDUCATION ===== -->
+    <div class="section-title">Education</div>
+    <div class="item" th:each="edu : ${resume.education}">
+        <div class="edu-header-row">
+            <span class="edu-institution" th:text="${edu.institution}">College Name</span>
+            <span class="edu-dates" th:text="${edu.graduationYear}">2020 – 2024</span>
+        </div>
+        <div class="edu-sub">
+            <span th:text="${edu.degree}">Degree — CGPA: X.XX</span>
+            <span th:text="${edu.location}">City, State</span>
+        </div>
+    </div>
+
+</body>
+</html>
