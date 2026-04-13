@@ -31,7 +31,7 @@ A professional, full-stack Resume Builder built with **Spring Boot** and **Mongo
 ### 2. Installation
 Clone the repository:
 ```bash
-git clone https://github.com/Shubham-Kumar-1/resume-builder.git
+git clone https://github.com/name/repositoryname.git
 cd resume-builder
 ```
 
